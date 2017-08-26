@@ -164,6 +164,14 @@ void pointxy(int col, int row, bool on)
   lc.setLed(0,VROW(row),VCOL(col),on);
 }
 
+void boxxy(int col, int row, bool on)
+{
+  lc.setLed(0,VROW(row),VCOL(col),on);
+  lc.setLed(0,VROW(row+1),VCOL(col),on);
+  lc.setLed(0,VROW(row),VCOL(col+1),on);
+  lc.setLed(0,VROW(row+1),VCOL(col+1),on);
+}
+
 void readXYJoystick(int *p_x, int *p_y)
 {
 	*p_x = ((analogRead(X_pin) + 128) >> 8) - 2;
@@ -174,15 +182,15 @@ void loop() {
   int col = 4;
   int row = 4;
   while (1) {
-	  pointxy(col,row,true);
+	  boxxy(col,row,true);
 	  delay(2*delaytime2);
-	  pointxy(col,row,false);
+	  boxxy(col,row,false);
 	  readXYJoystick(&x,&y);
 	  col -= x;
 	  row -= y;
           if (col < 0) col = 0;
-          if (col > 7) col = 7;
+          if (col > 6) col = 6;
           if (row < 0) row = 0;
-          if (row > 7) row = 7;
+          if (row > 6) row = 6;
    }
 }
