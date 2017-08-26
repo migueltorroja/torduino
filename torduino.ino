@@ -198,6 +198,38 @@ void readXYJoystick(int *p_x, int *p_y)
 }
 
 
+
+bool point_eq(int a_x,int a_y, int b_x, int b_y)
+{
+    if (a_x != b_x) return false;
+    if (a_y != b_y) return false;
+    return true;
+}
+
+bool check_collision(int sq_x, int sq_y, int dot_x, int dot_y)
+{
+    if (point_eq(sq_x,sq_y,dot_x,dot_y)) return true;
+    if (point_eq(sq_x+1,sq_y,dot_x,dot_y)) return true;
+    if (point_eq(sq_x+1,sq_y,dot_x+1,dot_y)) return true;
+    if (point_eq(sq_x,sq_y,dot_x+1,dot_y)) return true;
+    return false;
+}
+
+
+void draw_all(void)
+{
+  for (int i=0;i<8;i++) {
+      lc.setRow(0,i,B11111111);
+  }
+}
+
+void erase_all(void)
+{
+  for (int i=0;i<8;i++) {
+      lc.setRow(0,i,B00000000);
+  }
+}
+
 void loop() { 
   int x, y;
   int col = 4;
@@ -241,6 +273,16 @@ void loop() {
           pointxy(enemy_col,enemy_row,true);
           boxxy(col,row,true);
           delay(2*delaytime2);
+          if (check_collision(col,row,enemy_col,enemy_row)) {
+              boxxy(col,row,false);
+              delay(delaytime2);
+              boxxy(col,row,true);
+              delay(delaytime2);
+              boxxy(col,row,false);
+              delay(delaytime2);
+              boxxy(col,row,true);
+              delay(delaytime2);
+          }
           boxxy(col,row,false);
           pointxy(enemy_col,enemy_row,false);
           readXYJoystick(&x,&y);
