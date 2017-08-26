@@ -14,6 +14,25 @@
  */
 LedControl lc=LedControl(12,10,11,1);
 
+#define ROW_ENEMY (0)
+#define COL_ENEMY (1)
+#define ROW_REV_ENEMY (2)
+#define COL_REV_ENEMY (3)
+
+struct init_enemy_t {
+    int init_point;
+    int type;
+};
+
+init_enemy_t seq[] = {
+    {4, ROW_ENEMY},
+    {3, COL_ENEMY},
+    {2, COL_ENEMY},
+    {3, COL_REV_ENEMY},
+    {7, ROW_REV_ENEMY}
+};
+
+
 /* we always wait a bit between updates of the display */
 unsigned long delaytime1=500;
 unsigned long delaytime2=100;
@@ -177,20 +196,64 @@ void readXYJoystick(int *p_x, int *p_y)
 	*p_x = ((analogRead(X_pin) + 128) >> 8) - 2;
 	*p_y = ((analogRead(Y_pin) + 128) >> 8) - 2;
 }
+
+
 void loop() { 
   int x, y;
   int col = 4;
   int row = 4;
+  int nseq = 0;
+  int enemy_col = 0;
+  int enemy_row = 0;
+  int delta_col = 0;
+  int delta_row = 0;
+  int type;
+  int i;
   while (1) {
-	  boxxy(col,row,true);
-	  delay(2*delaytime2);
-	  boxxy(col,row,false);
-	  readXYJoystick(&x,&y);
-	  col -= x;
-	  row -= y;
+      type = seq[nseq].type;
+      switch(type) {
+          case ROW_ENEMY:
+              enemy_row = 0;
+              enemy_col = seq[nseq].init_point;
+              delta_row = 1;
+              delta_col = 0;
+              break;
+          case COL_ENEMY:
+              enemy_row = seq[nseq].init_point;
+              enemy_col = 0;
+              delta_row = 0;
+              delta_col = 1;
+              break;
+          case ROW_REV_ENEMY:
+              enemy_row = 7;
+              enemy_col = seq[nseq].init_point;
+              delta_row = -1;
+              delta_col = 0;
+              break;
+          case COL_REV_ENEMY:
+              enemy_row = seq[nseq].init_point;
+              enemy_col = 7;
+              delta_row = 0;
+              delta_col = -1;
+              break;
+      }
+      for (i=0;i<8;i++) {
+          pointxy(enemy_col,enemy_row,true);
+          boxxy(col,row,true);
+          delay(2*delaytime2);
+          boxxy(col,row,false);
+          pointxy(enemy_col,enemy_row,false);
+          readXYJoystick(&x,&y);
+          col -= x;
+          row -= y;
           if (col < 0) col = 0;
           if (col > 6) col = 6;
           if (row < 0) row = 0;
           if (row > 6) row = 6;
-   }
+          enemy_col += delta_col;
+          enemy_row += delta_row;
+      }
+      nseq ++;
+      if (nseq > 7) nseq = 0;
+  }
 }
