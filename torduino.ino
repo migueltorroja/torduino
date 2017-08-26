@@ -16,7 +16,12 @@ LedControl lc=LedControl(12,10,11,1);
 
 /* we always wait a bit between updates of the display */
 unsigned long delaytime1=500;
-unsigned long delaytime2=50;
+unsigned long delaytime2=100;
+
+const int SW_pin = 2;
+const int X_pin = 0;
+const int Y_pin = 1;
+
 void setup() {
   /*
    The MAX72XX is in power-saving mode on startup,
@@ -27,6 +32,9 @@ void setup() {
   lc.setIntensity(0,8);
   /* and clear the display */
   lc.clearDisplay(0);
+  pinMode(SW_pin, INPUT);
+  digitalWrite(SW_pin, HIGH);
+  Serial.begin(9600);
 }
 
 /*
@@ -156,12 +164,25 @@ void pointxy(int col, int row, bool on)
   lc.setLed(0,VROW(row),VCOL(col),on);
 }
 
+void readXYJoystick(int *p_x, int *p_y)
+{
+	*p_x = ((analogRead(X_pin) + 128) >> 8) - 2;
+	*p_y = ((analogRead(Y_pin) + 128) >> 8) - 2;
+}
 void loop() { 
-  for(int row=0;row<8;row++) {
-    for(int col=0;col<8;col++) {
-      pointxy(col,row,true);
-      delay(2*delaytime2);
-      pointxy(col,row,false);
-    }
-  }
+  int x, y;
+  int col = 4;
+  int row = 4;
+  while (1) {
+	  pointxy(col,row,true);
+	  delay(2*delaytime2);
+	  pointxy(col,row,false);
+	  readXYJoystick(&x,&y);
+	  col -= x;
+	  row -= y;
+          if (col < 0) col = 0;
+          if (col > 7) col = 7;
+          if (row < 0) row = 0;
+          if (row > 7) row = 7;
+   }
 }
