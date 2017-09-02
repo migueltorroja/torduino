@@ -3,6 +3,10 @@
 
 //We always have to include the library
 #include "LedControl.h"
+#include "LiquidCrystal.h"
+
+
+LiquidCrystal lcd(3, 4, 5, 6, 7, 8);
 
 /*
  Now we need a LedControl to work with.
@@ -41,6 +45,20 @@ const int SW_pin = 2;
 const int X_pin = 0;
 const int Y_pin = 1;
 
+
+unsigned int n_lives = 3;
+
+void print_lives(unsigned int n)
+{
+  unsigned int i;
+  lcd.setCursor(0,1);
+  lcd.print("Vidas: ");
+  for (i=0; i < n_lives;i++)
+  {
+    lcd.print("#");
+  }
+}
+
 void setup() {
   /*
    The MAX72XX is in power-saving mode on startup,
@@ -54,6 +72,9 @@ void setup() {
   pinMode(SW_pin, INPUT);
   digitalWrite(SW_pin, HIGH);
   Serial.begin(9600);
+  lcd.begin(16,2);
+  lcd.print("TORDUINO!!");
+  print_lives(n_lives);
 }
 
 /*
