@@ -47,6 +47,13 @@ const int Y_pin = 1;
 
 
 unsigned int n_lives = 3;
+unsigned long exp_time;
+
+
+void reset_timeout()
+{
+  exp_time = millis() + 120000UL;
+}
 
 void print_lives(unsigned int n)
 {
@@ -57,6 +64,15 @@ void print_lives(unsigned int n)
   {
     lcd.print("#");
   }
+  lcd.print(" ");
+}
+
+void print_time_left(void)
+{
+  lcd.setCursor(0,0);
+  lcd.print("Tiempo: ");
+  lcd.print((exp_time - millis())/1000);
+  lcd.print("    ");
 }
 
 void setup() {
@@ -72,8 +88,9 @@ void setup() {
   pinMode(SW_pin, INPUT);
   digitalWrite(SW_pin, HIGH);
   Serial.begin(9600);
+  reset_timeout();
   lcd.begin(16,2);
-  lcd.print("TORDUINO!!");
+  print_time_left();
   print_lives(n_lives);
 }
 
@@ -293,6 +310,7 @@ void loop() {
       for (i=0;i<8;i++) {
           pointxy(enemy_col,enemy_row,true);
           boxxy(col,row,true);
+          print_time_left();
           delay(2*delaytime2);
           if (check_collision(col,row,enemy_col,enemy_row)) {
               boxxy(col,row,false);
@@ -303,6 +321,11 @@ void loop() {
               delay(delaytime2);
               boxxy(col,row,true);
               delay(delaytime2);
+              if (n_lives > 0)
+              {
+                n_lives --;
+                print_lives(n_lives);
+              }
           }
           boxxy(col,row,false);
           pointxy(enemy_col,enemy_row,false);
