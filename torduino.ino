@@ -268,6 +268,30 @@ void erase_all(void)
   }
 }
 
+
+bool did_timeout(void)
+{
+  if (millis() > exp_time)
+    return true;
+  else
+    return false;
+}
+
+void reset_game(void)
+{
+  reset_timeout();
+  n_lives = 3;
+  draw_all();
+  delay(delaytime2);
+  erase_all();
+  delay(delaytime2);
+  draw_all();
+  delay(delaytime2);
+  erase_all();
+  delay(delaytime2);
+  print_lives(n_lives);
+}
+
 void loop() { 
   int x, y;
   int col = 4;
@@ -308,6 +332,10 @@ void loop() {
               break;
       }
       for (i=0;i<8;i++) {
+          if (did_timeout())
+          {
+            reset_game();
+          }
           pointxy(enemy_col,enemy_row,true);
           boxxy(col,row,true);
           print_time_left();
@@ -326,7 +354,13 @@ void loop() {
                 n_lives --;
                 print_lives(n_lives);
               }
+              if (!n_lives)
+              {
+                reset_game();
+              }
+
           }
+
           boxxy(col,row,false);
           pointxy(enemy_col,enemy_row,false);
           readXYJoystick(&x,&y);
