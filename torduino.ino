@@ -36,7 +36,7 @@ init_enemy_t seq[] = {
     {7, ROW_REV_ENEMY}
 };
 
-
+#define _SIZE(x) (sizeof(x)/sizeof(x[0]))
 /* we always wait a bit between updates of the display */
 unsigned long delaytime1=500;
 unsigned long delaytime2=100;
@@ -374,6 +374,6 @@ void loop() {
           enemy_row += delta_row;
       }
       nseq ++;
-      if (nseq > 7) nseq = 0;
+      if (nseq >= _SIZE(seq) ) nseq = 0;
   }
 }
